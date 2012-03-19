@@ -1,0 +1,29 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8" />
+	<title>Conway's Game of Life</title>
+	<link rel="stylesheet" type="text/css" href="conway.css" />
+	<script src="//ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
+	<script>window.jQuery || document.write('<script src="libs/jquery-1.7.1.min.js"><\/script>')</script>
+	<script src="conway.js" async defer></script>
+</head>
+
+<body>
+	<header>
+		<h1>Conway's game of life</h1>
+		<blockquote cite="http://en.wikipedia.org/wiki/Conway%27s_Game_of_Life">
+			The Game of Life, also known simply as Life, is a cellular automaton devised by the British mathematician John Horton Conway in 1970.
+		</blockquote>
+		<p><a href="http://en.wikipedia.org/wiki/Conway%27s_Game_of_Life">read more&hellip;</a>
+	</header>
+	<section id="config">
+		<h2>Config</h2>
+		<p><label>Mode: <input value="B3/S23" readonly></label>
+	</section>
+	<section>
+		<h2>Map</h2>
+		<canvas id="board" width="300" height="300"></canvas>
+	</section>
+</body>
+</html>

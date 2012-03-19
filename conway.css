@@ -1,0 +1,10 @@
+﻿
+body {
+}
+
+#config {
+}
+
+canvas#board {
+	border: dashed 1px grey;
+}
