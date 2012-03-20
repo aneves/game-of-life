@@ -1,9 +1,14 @@
 ﻿
 
 $(document).ready(function() {
-	$("#board").conway('init');
-	$("#draw").click(function(){
+	$("#board").conway();
+	$("#draw").click(function(e){
 		$("#board").conway('run');
+		e.preventDefault();
+	});
+	$("#step").click(function(e) {
+		$("#board").conway('step');
+		e.preventDefault();
 	});
 });
 
@@ -15,8 +20,20 @@ $(document).ready(function() {
   var cell_width;
   var height = 30;
   var cell_height;
+  var map;
   
   var methods = {
+    init : function() {
+		canvas = document.getElementById('board');
+		ctx = canvas.getContext('2d');
+		cell_width = canvas.width/width;
+		cell_height = canvas.height/height;
+		map = new Array(height);
+		for(var i = 0; i < height; i++) {
+			map[i] = new Array(width);
+		}
+		methods.wipe();
+	},
     run : function( options ) {
 		var settings = $.extend( {
 		  'born'		: 3,
@@ -31,20 +48,30 @@ $(document).ready(function() {
 		  ]
 		}, options);
 		
-		methods.clear();
+		this.data('conway-map', settings.map);
 
 		methods.draw(settings.map);
     },
-	init : function() {
-		canvas = document.getElementById('board');
-		ctx = canvas.getContext('2d');
-		cell_width = canvas.width/width;
-		cell_height = canvas.height/height;
+	step : function() {
+		var map = this.data('conway-map');
+		var newmap = methods.update(map);
+		this.data('conway-map', newmap);
+		methods.draw(map);
 	},
-    clear : function( ) {
+	update : function(oldMap) {
+		var map = new Array();
+		var i = 0;
+		for each( point in oldMap ) {
+			point[0]++;
+			map[i++] = point;
+		}
+	},
+	wipe : function() {
 		ctx.clearRect(0, 0, canvas.width, canvas.height);
     },
 	draw : function( map ) {
+		methods.wipe();
+
 		for each( point in map ) {
 			methods.drawPoint(point[0], point[1]);
 		}

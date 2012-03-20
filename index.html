@@ -18,17 +18,30 @@
 	</header>
 	<section id="config">
 		<h2>Config</h2>
-		<p><label>Mode: <input id="mode" value="B3/S23"></label>
-		<p><label>Map:<br>
-			<textarea id="map" rows="6" cols="50">
-1,1
-2,1
+		<form>
+			<p>Mode: cells are born if they have exactly
+					<input type="number" id="born" value="3">
+				neighbours, and stay alive when having between
+					<input type="number" id="alive-min" value="2">
+				and
+					<input type="number" id="alive-max" value="3">
+				neighbours.
+			<p><label>Map:<br>
+				<textarea id="map" rows="6" cols="50">
+1,1;
+2,1;
 3,1</textarea>
-			</label>
-		<p><input type="submit" value="draw" id="draw">
+				</label>
+			<p>
+				<input type="submit" value="draw" id="draw">
+				| <input type="reset" value="reset">
+		</form>
 	</section>
 	<section>
 		<h2>Board</h2>
+		<ul>
+			<li><a id="step" href="#">step</a></li>
+		</ul>
 		<canvas id="board" width="300" height="300"></canvas>
 	</section>
 </body>

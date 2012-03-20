@@ -8,3 +8,7 @@ body {
 canvas#board {
 	border: dashed 1px grey;
 }
+
+input[type="number"] {
+	width: 2em;
+}
