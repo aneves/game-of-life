@@ -6,7 +6,7 @@
 	<link rel="stylesheet" type="text/css" href="conway.css" />
 	<script src="//ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
 	<script>window.jQuery || document.write('<script src="libs/jquery-1.7.1.min.js"><\/script>')</script>
-	<script src="conway.js"></script>
+	<script src="conway.js" defer></script>
 </head>
 
 <body>
@@ -37,12 +37,12 @@
 	<section>
 		<h2>Board</h2>
 		<ul class="controls">
-			<li><button data-action="run">draw</button></li>
+			<li><button data-action="init">init</button></li>
 			<li><button data-action="step" disabled>step</button></li>
 			<li><button data-action="play" disabled>play</button></li>
 			<li><button data-action="stop" disabled>stop</button></li>
-			<li><button data-action="wipe" disabled>clear</button></li>
 		</ul>
+		Generation: <label id="generation">?</label><br>
 		<canvas id="board" width="300" height="300"></canvas>
 	</section>
 </body>

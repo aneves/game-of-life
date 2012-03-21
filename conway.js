@@ -3,9 +3,9 @@
 $(document).ready(function() {
 	$("#board").conway();
 	$('.controls button').click(function(e){
+		e.preventDefault();
 		var what = $(this).data('action');
 		$("#board").conway(what);
-		e.preventDefault();
 	});
 });
 
@@ -20,7 +20,13 @@ $(document).ready(function() {
 
   var state;
   var settings;
-  var buttons;
+  var ui = {
+			run:  $('.controls button[data-action="run"]'),
+			step: $('.controls button[data-action="step"]'),
+			play: $('.controls button[data-action="play"]'),
+			stop: $('.controls button[data-action="stop"]'),
+			gene: $('#generation'),
+		};
   
   var methods = {
     init : function() {
@@ -28,55 +34,17 @@ $(document).ready(function() {
 		ctx = canvas.getContext('2d');
 		cell_width = canvas.width/width;
 		cell_height = canvas.height/height;
-		
-		buttons = {
-			draw: $('#draw'),
-			step: $('#step'),
-			play: $('#play'),
-			stop: $('#stop'),
-			clear: $('#clear'),
-		}
-
 		methods.wipe();
+		methods.zero_gen();
 	},
-	wipe : function() {
-		ctx.clearRect(0, 0, canvas.width, canvas.height);
-    },
-	draw : function() {
-		methods.wipe();
-		buttons.step.removeAttr('disabled');
-		buttons.clear.removeAttr('disabled');
-		for(var y = 0; y < height; y++) {
-			for(var x = 0; x < width; x++) {
-				if(state.world[y][x] != 0) {
-					methods.drawPoint(x, y);
-				}
-			}
-		}
-	},
-	drawPoint : function( x, y ) {
-		var x1 = x*cell_width;
-		var y1 = y*cell_height;
-		ctx.fillStyle = "rgb(200,0,0)";
-		ctx.fillRect (x1, y1, cell_width, cell_height);
-	},
-    initWorld : function() {
-		var world = new Array(height);
-		for(var y = 0; y < height; y++) {
-			world[y] = new Array(width);
-			for(var x = 0; x < width; x++) {
-				world[y][x] = 0;
-			}
-		}
-		return world;
-	},
-    run : function( options ) {
+    zero_gen : function( options ) {
 		settings = $.extend( {
 		  'born'		: 3,
 		  'survive'	: {
 			'min'	: 2,
-			'max'	: 3
+			'max'	: 3,
 		  },
+		  'period': 500,
 		  'map'			: [
 			[1, 1],
 			[2, 1],
@@ -96,15 +64,63 @@ $(document).ready(function() {
 			wo[y][x] = born;
 		}
 		state = {
+			generation: 0,
 			world : wo,
-			old_world : methods.initWorld()
+			old_world : methods.initWorld(),
 		};
 
 		methods.draw();
+		ui.step.removeAttr('disabled');
+		ui.play.removeAttr('disabled');
     },
+	wipe : function() {
+		ctx.clearRect(0, 0, canvas.width, canvas.height);
+    },
+	draw : function() {
+		methods.wipe();
+		for(var y = 0; y < height; y++) {
+			for(var x = 0; x < width; x++) {
+				if(state.world[y][x] != 0) {
+					methods.drawPoint(x, y);
+				}
+			}
+		}
+		ui.gene.text(state.generation);
+	},
+	drawPoint : function( x, y ) {
+		var x1 = x*cell_width;
+		var y1 = y*cell_height;
+		ctx.fillStyle = "rgb(200,0,0)";
+		ctx.fillRect (x1, y1, cell_width, cell_height);
+	},
+    initWorld : function() {
+		var world = new Array(height);
+		for(var y = 0; y < height; y++) {
+			world[y] = new Array(width);
+			for(var x = 0; x < width; x++) {
+				world[y][x] = 0;
+			}
+		}
+		return world;
+	},
 	step : function() {
+		methods.stop();
+		methods.do_step();
+	},
+	do_step : function() {
 		methods.update();
 		methods.draw();
+	},
+	play : function() {
+		methods.do_step();
+		state.play_id = window.setInterval(methods.do_step, settings.period);
+		ui.play.attr('disabled', '');
+		ui.stop.removeAttr('disabled');
+	},
+	stop : function() {
+		window.clearInterval(state.play_id);
+		ui.play.removeAttr('disabled');
+		ui.stop.attr('disabled', '');
 	},
 	update : function() {
 		var wo = state.old_world; // hand me the leftover memory from yesterday's dinner...
@@ -142,6 +158,7 @@ $(document).ready(function() {
 		}
 		state.world = wo;
 		state.old_world = old;
+		state.generation++;
 	},
 	incrementNeighbours : function(world, x, y) {
 		if(x > 0) {
