@@ -13,9 +13,9 @@ $(document).ready(function() {
   var canvas;
   var ctx;
   
-  var width = 10;
+  var width = 50;
   var cell_width;
-  var height = 10;
+  var height = 50;
   var cell_height;
 
   var state;
@@ -46,11 +46,12 @@ $(document).ready(function() {
 		  },
 		  'period': 500,
 		  'map'			: [
-			[1, 1],
-			[2, 1],
-			[3, 1],
-			[2, 2],
-			[2, 3],
+			[21, 21],
+			[22, 21],
+			[23, 21],
+			[22, 22],
+			[22, 23],
+			[22, 24],
 		  ]
 		}, options);
 
@@ -62,6 +63,9 @@ $(document).ready(function() {
 			x = point[0];
 			y = point[1];
 			wo[y][x] = born;
+		}
+		if( state !== undefined) {
+			methods.stop();
 		}
 		state = {
 			generation: 0,
@@ -113,6 +117,7 @@ $(document).ready(function() {
 	},
 	play : function() {
 		methods.do_step();
+		window.clearInterval(state.play_id);
 		state.play_id = window.setInterval(methods.do_step, settings.period);
 		ui.play.attr('disabled', '');
 		ui.stop.removeAttr('disabled');
