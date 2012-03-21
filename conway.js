@@ -2,12 +2,9 @@
 
 $(document).ready(function() {
 	$("#board").conway();
-	$("#draw").click(function(e){
-		$("#board").conway('run');
-		e.preventDefault();
-	});
-	$("#step").click(function(e) {
-		$("#board").conway('step');
+	$('.controls button').click(function(e){
+		var what = $(this).data('action');
+		$("#board").conway(what);
 		e.preventDefault();
 	});
 });
@@ -23,6 +20,7 @@ $(document).ready(function() {
 
   var state;
   var settings;
+  var buttons;
   
   var methods = {
     init : function() {
@@ -30,6 +28,15 @@ $(document).ready(function() {
 		ctx = canvas.getContext('2d');
 		cell_width = canvas.width/width;
 		cell_height = canvas.height/height;
+		
+		buttons = {
+			draw: $('#draw'),
+			step: $('#step'),
+			play: $('#play'),
+			stop: $('#stop'),
+			clear: $('#clear'),
+		}
+
 		methods.wipe();
 	},
 	wipe : function() {
@@ -37,6 +44,8 @@ $(document).ready(function() {
     },
 	draw : function() {
 		methods.wipe();
+		buttons.step.removeAttr('disabled');
+		buttons.clear.removeAttr('disabled');
 		for(var y = 0; y < height; y++) {
 			for(var x = 0; x < width; x++) {
 				if(state.world[y][x] != 0) {

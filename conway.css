@@ -12,3 +12,13 @@ canvas#board {
 input[type="number"] {
 	width: 2em;
 }
+
+ul.controls {
+	padding: 0;
+}
+ul.controls li {
+	display: inline-block;
+}
+ul.controls li+li {
+	margin-left: 3px;
+}
