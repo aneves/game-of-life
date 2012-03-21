@@ -23,9 +23,12 @@ $(document).ready(function() {
   var ui = {
 			run:  $('.controls button[data-action="run"]'),
 			step: $('.controls button[data-action="step"]'),
+			slower: $('.controls button[data-action="slower"]'),
 			play: $('.controls button[data-action="play"]'),
+			faster: $('.controls button[data-action="faster"]'),
 			stop: $('.controls button[data-action="stop"]'),
 			gene: $('#generation'),
+			speed: $('#speed'),
 		};
   
   var methods = {
@@ -44,7 +47,8 @@ $(document).ready(function() {
 			'min'	: 2,
 			'max'	: 3,
 		  },
-		  'period': 500,
+		  'period': 1000,
+		  'speed': 2,
 		  'map'			: [
 			[21, 21],
 			[22, 21],
@@ -64,7 +68,7 @@ $(document).ready(function() {
 			y = point[1];
 			wo[y][x] = born;
 		}
-		if( state !== undefined) {
+		if( state !== undefined ) {
 			methods.stop();
 		}
 		state = {
@@ -75,7 +79,9 @@ $(document).ready(function() {
 
 		methods.draw();
 		ui.step.removeAttr('disabled');
+		ui.slower.removeAttr('disabled');
 		ui.play.removeAttr('disabled');
+		ui.faster.removeAttr('disabled');
     },
 	wipe : function() {
 		ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -90,6 +96,7 @@ $(document).ready(function() {
 			}
 		}
 		ui.gene.text(state.generation);
+		ui.speed.text(settings.speed);
 	},
 	drawPoint : function( x, y ) {
 		var x1 = x*cell_width;
@@ -118,7 +125,7 @@ $(document).ready(function() {
 	play : function() {
 		methods.do_step();
 		window.clearInterval(state.play_id);
-		state.play_id = window.setInterval(methods.do_step, settings.period);
+		state.play_id = window.setInterval(methods.do_step, settings.period / settings.speed);
 		ui.play.attr('disabled', '');
 		ui.stop.removeAttr('disabled');
 	},
@@ -126,6 +133,18 @@ $(document).ready(function() {
 		window.clearInterval(state.play_id);
 		ui.play.removeAttr('disabled');
 		ui.stop.attr('disabled', '');
+	},
+	faster : function() {
+		if(settings.speed < 30) {
+			settings.speed *= 2;
+		}
+		methods.play();
+	},
+	slower : function() {
+		if(settings.speed > 1) {
+			settings.speed /= 2;
+		}
+		methods.play();
 	},
 	update : function() {
 		var wo = state.old_world; // hand me the leftover memory from yesterday's dinner...
