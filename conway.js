@@ -4,12 +4,35 @@ $(document).ready(function() {
 	$("#board").conway();
 	$('.controls button').click(function(e){
 		e.preventDefault();
-		var what = $(this).data('action');
-		$("#board").conway(what);
+		var action = $(this).data('action');
+		$("#board").conway(action);
 	});
 });
 
 (function( $ ) {
+	var default_settings = {
+		  'born'		: 3,
+		  'survive'	: {
+			'min'	: 2,
+			'max'	: 3,
+		  },
+		  'period'	: 1000,
+		  'speed'	: 2,
+		  'map'		: maps['pulsar']
+		}
+	var maps = {
+		'T':	[[21,21], [22, 21], [23, 21], [22, 22], [22, 23], [22, 24]],
+		'glider':		[[1,3], [2,3], [3,3], [3,2], [2,1]],
+		'LWSS':			[[3,4], [4,3], [5,3], [6,3], [7,3], [7,4], [7,5], [6,6], [3,6]],
+		'half-pulsar':		[[4,2],[5,2],[6,2], [4,7],[5,7],[6,7], [2,4],[2,5],[2,6], [7,4],[7,5],[7,6],
+						 [9,4],[9,5],[9,6], [14,4],[14,5],[14,6], [10,2],[11,2],[12,2], [10,7],[11,7],[12,7],
+						 ],
+		'pulsar':		[[4,2],[5,2],[6,2], [4,7],[5,7],[6,7], [2,4],[2,5],[2,6], [7,4],[7,5],[7,6],
+						 [9,4],[9,5],[9,6], [14,4],[14,5],[14,6], [10,2],[11,2],[12,2], [10,7],[11,7],[12,7],
+						 [4,9],[5,9],[6,9], [4,14],[5,14],[6,14], [2,10],[2,11],[2,12], [7,10],[7,11],[7,12],
+						 [10,9],[11,9],[12,9], [10,14],[11,14],[12,14], [9,10],[9,11],[9,12], [14,10],[14,11],[14,12],
+						 ],
+	}
   var canvas;
   var ctx;
   
@@ -41,23 +64,7 @@ $(document).ready(function() {
 		methods.zero_gen();
 	},
     zero_gen : function( options ) {
-		settings = $.extend( {
-		  'born'		: 3,
-		  'survive'	: {
-			'min'	: 2,
-			'max'	: 3,
-		  },
-		  'period': 1000,
-		  'speed': 2,
-		  'map'			: [
-			[21, 21],
-			[22, 21],
-			[23, 21],
-			[22, 22],
-			[22, 23],
-			[22, 24],
-		  ]
-		}, options);
+		settings = $.extend( default_settings, options);
 
 		var wo = methods.initWorld();
 		var x;
