@@ -3,10 +3,12 @@
 	"use strict";
 	$(document).ready(function () {
 		$("#board").conway();
-		$('.controls button').click(function (e) {
-			e.preventDefault();
-			var action = $(this).data('action');
-			$("#board").conway(action);
+		$('.controls button').on({
+			click: function (e) {
+				e.preventDefault();
+				var action = $(this).data('action');
+				$("#board").conway(action);
+			}
 		});
 	});
 
@@ -22,7 +24,7 @@
 						 [4, 9], [5, 9], [6, 9], [4, 14], [5, 14], [6, 14], [2, 10], [2, 11], [2, 12], [7, 10], [7, 11], [7, 12],
 						 [10, 9], [11, 9], [12, 9], [10, 14], [11, 14], [12, 14], [9, 10], [9, 11], [9, 12], [14, 10], [14, 11], [14, 12]
 						 ]
-	},
+		},
 		default_settings = {
 			'born'		: 3,
 			'survive'	: {
@@ -52,11 +54,32 @@
 			speed: $('#speed')
 		},
 		methods = {
-			init : function () {
-				canvas = document.getElementById('board');
+			bootstrap : function () {
+				canvas = $(this)[0];
 				ctx = canvas.getContext('2d');
 				cell_width = canvas.width / width;
 				cell_height = canvas.height / height;
+				methods.init();
+				$(this).on({
+					click: function (e) {
+						var xClick = e.clientX,
+							yClick = e.clientY,
+							baseOffset = $(this).offset(),
+							xOffset = xClick - baseOffset.left,
+							yOffset = yClick - baseOffset.top,
+							x = Math.floor(xOffset / cell_width),
+							y = Math.floor(yOffset / cell_height);
+						if (state.world[y][x] === 0) {
+							methods.drawPoint(x, y);
+							state.world[y][x] = settings.born;
+						} else {
+							methods.wipePoint(x, y);
+							state.world[y][x] = 0;
+						}
+					}
+				});
+			},
+			init : function () {
 				methods.wipe();
 				methods.zero_gen();
 			},
@@ -103,6 +126,11 @@
 				}
 				ui.gene.text(state.generation);
 				ui.speed.text(settings.speed);
+			},
+			wipePoint : function (x, y) {
+				var x1 = x * cell_width,
+					y1 = y * cell_height;
+				ctx.clearRect(x1, y1, cell_width, cell_height);
 			},
 			drawPoint : function (x, y) {
 				var x1 = x * cell_width,
@@ -223,7 +251,7 @@
 			return methods[method].apply(this, Array.prototype.slice.call(arguments, 1));
 		}
 		if (typeof method === 'object' || !method) {
-			return methods.init.apply(this, arguments);
+			return methods.bootstrap.apply(this, arguments);
 		}
 		$.error('Method ' + method + ' does not exist on jQuery.conway');
 	};
