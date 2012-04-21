@@ -2,7 +2,31 @@
 body {
 }
 
+* {
+	max-width: 100%;
+}
+
 #config {
+	width: 300px;
+	float: right;
+	border-left: dashed 1px grey;
+	padding: 0 15px;
+	margin-left: 5px;
+	background: #f8f8f8;
+}
+
+#board {
+	margin-right: 310px;
+}
+
+blockquote {
+}
+blockquote[cite]::after {
+	border-left: dotted 1px grey;
+	padding-left: 0.2em;
+	margin-left: 0.5em;
+	display: block;
+	content: attr(cite);
 }
 
 canvas#board {
@@ -10,15 +34,15 @@ canvas#board {
 }
 
 input[type="number"] {
-	width: 2em;
+	width: 3em;
 }
 
-ul.controls {
+#controls ul {
 	padding: 0;
 }
-ul.controls li {
+#controls li {
 	display: inline-block;
 }
-ul.controls li+li {
+#controls li+li {
 	margin-left: 3px;
 }

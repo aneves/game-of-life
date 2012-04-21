@@ -2,23 +2,44 @@
 (function ($) {
 	"use strict";
 	$(document).ready(function () {
-		$("#board").conway();
-		$('.controls button').on({
+		$("#board canvas").conway();
+		$('#controls button').on({
 			click: function (e) {
 				e.preventDefault();
 				var action = $(this).data('action');
 				$("#board").conway(action);
 			}
 		});
+		$('#config form').on({
+			submit:	function(e) {
+				var options = {
+					'born'		: parseInt($('#born').val()),
+					'alive'	: {
+						'min'	: parseInt($('#alive-min').val()),
+						'max'	: parseInt($('#alive-max').val())
+					},
+					'speed'		: parseInt	($('#speed').text()),
+					'map'		: JSON.parse($('#map').val()),
+					'width'		: parseInt($('#board-width').val()),
+					'height'	: parseInt($('#board-height').val())
+				};
+				$("#board").conway('init', options);
+				e.preventDefault();
+			}
+		});
+		$('#board-height').attr('disabled', '');
+		$('#board-width').on({
+			'change': function() {
+				$('#board-height').val($(this).val());
+			}
+		});
+		$('#board-width').change();
 	});
 
 	var maps = {
 		'T':	[[21, 21], [22, 21], [23, 21], [22, 22], [22, 23], [22, 24]],
 		'glider':		[[1, 3], [2, 3], [3, 3], [3, 2], [2, 1]],
 		'LWSS':			[[3, 4], [4, 3], [5, 3], [6, 3], [7, 3], [7, 4], [7, 5], [6, 6], [3, 6]],
-		'half-pulsar':	[[4, 2], [5, 2], [6, 2], [4, 7], [5, 7], [6, 7], [2, 4], [2, 5], [2, 6], [7, 4], [7, 5], [7, 6],
-						 [9, 4], [9, 5], [9, 6], [14, 4], [14, 5], [14, 6], [10, 2], [11, 2], [12, 2], [10, 7], [11, 7], [12, 7]
-						 ],
 		'pulsar':		[[4, 2], [5, 2], [6, 2], [4, 7], [5, 7], [6, 7], [2, 4], [2, 5], [2, 6], [7, 4], [7, 5], [7, 6],
 						 [9, 4], [9, 5], [9, 6], [14, 4], [14, 5], [14, 6], [10, 2], [11, 2], [12, 2], [10, 7], [11, 7], [12, 7],
 						 [4, 9], [5, 9], [6, 9], [4, 14], [5, 14], [6, 14], [2, 10], [2, 11], [2, 12], [7, 10], [7, 11], [7, 12],
@@ -27,64 +48,86 @@
 		},
 		default_settings = {
 			'born'		: 3,
-			'survive'	: {
+			'alive'	: {
 				'min'	: 2,
 				'max'	: 3
 			},
+			'width'		: 50,
+			'height'	: 50,
 			'period'	: 1000,
-			'speed'	: 2,
+			'speed'		: 2,
 			'map'		: maps.pulsar
 		},
 		canvas,
 		ctx,
-		width = 50,
 		cell_width,
-		height = 50,
 		cell_height,
 		state,
 		settings,
 		ui = {
-			run:	$('.controls button[data-action="run"]'),
-			step: $('.controls button[data-action="step"]'),
-			slower: $('.controls button[data-action="slower"]'),
-			play: $('.controls button[data-action="play"]'),
-			faster: $('.controls button[data-action="faster"]'),
-			stop: $('.controls button[data-action="stop"]'),
+			born: $('#born'),
+			alive: {
+				min: $('#alive-min'),
+				max: $('#alive-max')
+			},
+			run:	$('#controls button[data-action="run"]'),
+			step: $('#controls button[data-action="step"]'),
+			slower: $('#controls button[data-action="slower"]'),
+			play: $('#controls button[data-action="play"]'),
+			faster: $('#controls button[data-action="faster"]'),
+			stop: $('#controls button[data-action="stop"]'),
 			gene: $('#generation'),
-			speed: $('#speed')
+			speed: $('#speed'),
+			mode: $('#mode')
 		},
+		togglePoint = function (e) {
+				var xClick = e.clientX,
+					yClick = e.clientY,
+					baseOffset = $(this).offset(),
+					xOffset = xClick - baseOffset.left,
+					yOffset = yClick - baseOffset.top,
+					x = Math.floor(xOffset / cell_width),
+					y = Math.floor(yOffset / cell_height);
+				if (state.world[y][x] === 0) {
+					methods.drawPoint(x, y);
+					state.world[y][x] = settings.born;
+				} else {
+					methods.wipePoint(x, y);
+					state.world[y][x] = 0;
+				}
+			},
 		methods = {
 			bootstrap : function () {
+				var map,
+					item,
+					option;
 				canvas = $(this)[0];
 				ctx = canvas.getContext('2d');
-				cell_width = canvas.width / width;
-				cell_height = canvas.height / height;
+				map = $("#map");
+				map.html("");
+				for(item in maps) {
+					option = $("<option value='" + JSON.stringify(maps[item]) + "'>" + item + "</option>");
+					map.append(option);
+					if(maps[item] === default_settings.map){
+						option.attr('selected', 'selected');
+					}
+				}
 				methods.init();
 				$(this).on({
-					click: function (e) {
-						var xClick = e.clientX,
-							yClick = e.clientY,
-							baseOffset = $(this).offset(),
-							xOffset = xClick - baseOffset.left,
-							yOffset = yClick - baseOffset.top,
-							x = Math.floor(xOffset / cell_width),
-							y = Math.floor(yOffset / cell_height);
-						if (state.world[y][x] === 0) {
-							methods.drawPoint(x, y);
-							state.world[y][x] = settings.born;
-						} else {
-							methods.wipePoint(x, y);
-							state.world[y][x] = 0;
-						}
-					}
+					click: togglePoint
 				});
 			},
-			init : function () {
+			init : function (options) {
 				methods.wipe();
+				settings = $.extend(default_settings, options);
+				cell_width = canvas.width / settings.width;
+				cell_height = canvas.height / settings.height;
 				methods.zero_gen();
 			},
-			zero_gen : function (options) {
-				settings = $.extend(default_settings, options);
+			zero_gen : function () {
+				
+				ui.speed.text(settings.speed);
+				ui.mode.text( "B" + settings.born + "S" + settings.alive.min + settings.alive.max );
 
 				var wo = methods.initWorld(),
 					x,
@@ -117,15 +160,14 @@
 				var x,
 					y;
 				methods.wipe();
-				for (y = 0; y < height; y++) {
-					for (x = 0; x < width; x++) {
+				for (y = 0; y < settings.height; y++) {
+					for (x = 0; x < settings.width; x++) {
 						if (state.world[y][x] !== 0) {
 							methods.drawPoint(x, y);
 						}
 					}
 				}
 				ui.gene.text(state.generation);
-				ui.speed.text(settings.speed);
 			},
 			wipePoint : function (x, y) {
 				var x1 = x * cell_width,
@@ -142,9 +184,9 @@
 				var world = [],
 					y,
 					x;
-				for (y = 0; y < height; y++) {
+				for (y = 0; y < settings.height; y++) {
 					world[y] = [];
-					for (x = 0; x < width; x++) {
+					for (x = 0; x < settings.width; x++) {
 						world[y][x] = 0;
 					}
 				}
@@ -174,12 +216,14 @@
 				if (settings.speed < 30) {
 					settings.speed  *= 2;
 				}
+				ui.speed.text(settings.speed);
 				methods.play();
 			},
 			slower : function () {
 				if (settings.speed > 1) {
 					settings.speed /= 2;
 				}
+				ui.speed.text(settings.speed);
 				methods.play();
 			},
 			update : function () {
@@ -189,30 +233,30 @@
 					y,
 					numNeighbours;
 				// init
-				for (y = 0; y < width; y++) {
-					for (x = 0; x < height; x++) {
+				for (y = 0; y < settings.width; y++) {
+					for (x = 0; x < settings.height; x++) {
 						wo[y][x] = 0;
 					}
 				}
 				// count neighbours
-				for (y = 0; y < width; y++) {
-					for (x = 0; x < height; x++) {
+				for (y = 0; y < settings.width; y++) {
+					for (x = 0; x < settings.height; x++) {
 						if (old[y][x] > 0) {
 							methods.incrementNeighbours(wo, x, y);
 						}
 					}
 				}
 				// cull
-				for (y = 0; y < width; y++) {
-					for (x = 0; x < height; x++) {
+				for (y = 0; y < settings.width; y++) {
+					for (x = 0; x < settings.height; x++) {
 						numNeighbours = wo[y][x];
 						if (old[y][x] === 0) { // Born?
 							if (numNeighbours !== settings.born) {
 								wo[y][x] = 0; // Almost; try again.
 							}
 						} else { // Or stay alive?
-							if (numNeighbours < settings.survive.min
-									|| numNeighbours > settings.survive.max
+							if (numNeighbours < settings.alive.min
+									|| numNeighbours > settings.alive.max
 									) {
 								wo[y][x] = 0; // Almost; try again.
 							}
@@ -229,7 +273,7 @@
 				}
 				methods.incrementNeighboursY(world, x, y);
 				world[y][x] -= 1;
-				if (x < width - 1) {
+				if (x < settings.width - 1) {
 					methods.incrementNeighboursY(world, x + 1, y);
 				}
 			},
@@ -238,7 +282,7 @@
 					world[y - 1][x] += 1;
 				}
 				world[y][x] += 1;
-				if (y < height - 1) {
+				if (y < settings.height - 1) {
 					world[y + 1][x] += 1;
 				}
 			}
