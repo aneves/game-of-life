@@ -132,11 +132,19 @@
 				var wo = methods.initWorld(),
 					x,
 					y,
-					born = settings.born;
+					born = settings.born,
+					alerted = false;
 				settings.map.forEach(function (point) {
 					x = point[0];
 					y = point[1];
-					wo[y][x] = born;
+					if( x < settings.width
+						&& y < settings.height
+						) {
+						wo[y][x] = born;
+					} else if(!alerted) {
+						alerted = true;
+						alert("Map is not big enough to hold point [" + x + ", " + y + "]");
+					}
 				});
 				if (state !== undefined) {
 					methods.stop();
