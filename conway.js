@@ -34,7 +34,7 @@
 		$('#square').on({
 			'change':	function() {
 				var enable = $(this).is(':checked');
-				if(enable) {
+				if (enable) {
 					$('#board-height').attr('disabled', '');
 					$('#board-width').on({
 						'change': updateHeight
@@ -96,7 +96,12 @@
 			speed: $('#speed'),
 			mode: $('#mode')
 		},
+		brushIsAdding = true,
+		brushIsPainting = false,
 		togglePoint = function (e) {
+				if (!brushIsPainting) {
+					return;
+				}
 				var xClick = e.clientX,
 					yClick = e.clientY,
 					baseOffset = $(this).offset(),
@@ -104,13 +109,28 @@
 					yOffset = yClick - baseOffset.top,
 					x = Math.floor(xOffset / cell_width),
 					y = Math.floor(yOffset / cell_height);
-				if (state.world[y][x] === 0) {
+				if (brushIsAdding) {
 					methods.drawPoint(x, y);
 					state.world[y][x] = settings.born;
 				} else {
 					methods.wipePoint(x, y);
 					state.world[y][x] = 0;
 				}
+			},
+		finishPainting = function(e) {
+			togglePoint.call(this, e);
+			brushIsPainting = false;
+		},
+		startPainting = function (e) {
+				var xClick = e.clientX,
+					yClick = e.clientY,
+					baseOffset = $(this).offset(),
+					xOffset = xClick - baseOffset.left,
+					yOffset = yClick - baseOffset.top,
+					x = Math.floor(xOffset / cell_width),
+					y = Math.floor(yOffset / cell_height);
+				brushIsAdding = state.world[y][x] === 0;
+				brushIsPainting = true;
 			},
 		methods = {
 			bootstrap : function () {
@@ -124,13 +144,15 @@
 				for(item in maps) {
 					option = $("<option value='" + JSON.stringify(maps[item]) + "'>" + item + "</option>");
 					map.append(option);
-					if(maps[item] === default_settings.map){
+					if (maps[item] === default_settings.map){
 						option.attr('selected', 'selected');
 					}
 				}
 				methods.init();
 				$(this).on({
-					click: togglePoint
+					mousedown:	startPainting,
+					mousemove:	togglePoint,
+					mouseup:	finishPainting
 				});
 			},
 			init : function (options) {
@@ -153,11 +175,11 @@
 				settings.map.forEach(function (point) {
 					x = point[0];
 					y = point[1];
-					if( x < settings.width
+					if (x < settings.width
 						&& y < settings.height
 						) {
 						wo[y][x] = born;
-					} else if(!alerted) {
+					} else if (!alerted) {
 						alerted = true;
 						alert("Map is not big enough to hold point [" + x + ", " + y + "]");
 					}
@@ -294,27 +316,27 @@
 			incrementNeighbours : function (world, x, y) {
 				if (x > 0) {
 					methods.incrementNeighboursY(world, x - 1, y);
-				} else if(settings.toroidal) {
+				} else if (settings.toroidal) {
 					methods.incrementNeighboursY(world, settings.width - 1, y);
 				}
 				methods.incrementNeighboursY(world, x, y);
 				world[y][x] -= 1;
 				if (x < settings.width - 1) {
 					methods.incrementNeighboursY(world, x + 1, y);
-				} else if(settings.toroidal) {
+				} else if (settings.toroidal) {
 					methods.incrementNeighboursY(world, 0, y);
 				}
 			},
 			incrementNeighboursY : function (world, x, y) {
 				if (y > 0) {
 					world[y - 1][x] += 1;
-				} else if(settings.toroidal) {
+				} else if (settings.toroidal) {
 					world[settings.height - 1][x] += 1;
 				}
 				world[y][x] += 1;
 				if (y < settings.height - 1) {
 					world[y + 1][x] += 1;
-				} else if(settings.toroidal) {
+				} else if (settings.toroidal) {
 					world[0][x] += 1;
 				}
 			}
