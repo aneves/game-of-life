@@ -6,14 +6,14 @@
 				$('#board-height').val($(this).val());
 			};
 		$("#board canvas").conway();
-		$('#controls button').on({
+		$('.controls button, button.control').on({
 			click: function (e) {
 				e.preventDefault();
 				var action = $(this).data('action');
 				$("#board").conway(action);
 			}
 		});
-		$('#config form').on({
+		$('form#config').on({
 			submit:	function(e) {
 				var options = {
 					'born'		: parseInt($('#born').val()),
@@ -22,7 +22,6 @@
 						'max'	: parseInt($('#alive-max').val())
 					},
 					'speed'		: parseInt	($('#speed').text()),
-					'map'		: JSON.parse($('#map').val()),
 					'width'		: parseInt($('#board-width').val()),
 					'height'	: parseInt($('#board-height').val()),
 					'toroidal'	: $('#toroidal').is(':checked')
@@ -86,15 +85,16 @@
 				min: $('#alive-min'),
 				max: $('#alive-max')
 			},
-			run:	$('#controls button[data-action="run"]'),
-			step: $('#controls button[data-action="step"]'),
-			slower: $('#controls button[data-action="slower"]'),
-			play: $('#controls button[data-action="play"]'),
-			faster: $('#controls button[data-action="faster"]'),
-			stop: $('#controls button[data-action="stop"]'),
+			run:	$('.controls button[data-action="run"]'),
+			step: $('.controls button[data-action="step"]'),
+			slower: $('.controls button[data-action="slower"]'),
+			play: $('.controls button[data-action="play"]'),
+			faster: $('.controls button[data-action="faster"]'),
+			stop: $('.controls button[data-action="stop"]'),
 			gene: $('#generation'),
 			speed: $('#speed'),
-			mode: $('#mode')
+			mode: $('#mode'),
+			output: $('#output')
 		},
 		brushIsAdding = true,
 		brushIsPainting = false,
@@ -154,6 +154,22 @@
 					mousemove:	togglePoint,
 					mouseup:	finishPainting
 				});
+			},
+			loadMap : function () {
+				var map = JSON.parse($('#map').val());
+				settings.map = map;
+				methods.zero_gen();
+			},
+			exportMap : function () {
+				var x, y, map = [];
+				for (y = 0; y < settings.height; y++) {
+					for (x = 0; x < settings.width; x++) {
+						if (state.world[y][x] !== 0) {
+							map.push([x,y]);
+						}
+					}
+				}
+				ui.output.text("Current map: \n" + JSON.stringify(map));
 			},
 			init : function (options) {
 				methods.wipe();

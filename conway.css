@@ -6,20 +6,27 @@ body {
 	max-width: 100%;
 }
 
-#config {
+#sidebar {
 	width: 300px;
 	float: right;
 	border-left: dashed 1px grey;
 	padding: 0 15px;
 	margin-left: 5px;
+	margin-bottom: 15px;
 	background: #f8f8f8;
+}
+#sidebar >*+* {
+	border-top: dashed 1px grey;
 }
 
 #board {
 	margin-right: 310px;
 }
 
-blockquote {
+blockquote, #output {
+	border-left: dotted 1px black;
+	padding-left: 5px;
+	white-space: pre-wrap;
 }
 blockquote[cite]::after {
 	border-left: dotted 1px grey;
@@ -37,12 +44,12 @@ input[type="number"] {
 	width: 3em;
 }
 
-#controls ul {
+ul.controls {
 	padding: 0;
 }
-#controls li {
+ul.controls li {
 	display: inline-block;
 }
-#controls li+li {
+ul.controls li+li {
 	margin-left: 3px;
 }

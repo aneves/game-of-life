@@ -12,40 +12,49 @@
 <body>
 	<header>
 		<h1>Conway's game of life</h1>
-		<blockquote cite="http://en.wikipedia.org/wiki/Conway%27s_Game_of_Life">
-			The <a href="http://en.wikipedia.org/wiki/Conway%27s_Game_of_Life">Game of Life</a>, also known simply as Life, is a cellular automaton devised by the British mathematician John Horton Conway in 1970.
+		<blockquote cite="http://en.wikipedia.org/wiki/Conway's_Game_of_Life">
+			The <a href="http://en.wikipedia.org/wiki/Conway's_Game_of_Life">Game of Life</a>, also known simply as Life, is a cellular automaton devised by the British mathematician John Horton Conway in 1970.
 		</blockquote>
 	</header>
-	<section id="config">
-		<h2>Config</h2>
-		<form>
-			<p>	Mode: cells are born if they have exactly
-					<input type="number" id="born" value="3">
-				neighbours, and stay alive when having between
-					<input type="number" id="alive-min" value="2">
-				and
-					<input type="number" id="alive-max" value="3">
-				neighbours.
-			<p>	Map: <select id="map"></select>
-			<p>
-				Board size: <input type="number" id="board-width" value="50">*<input type="number" id="board-height" value="50">
-				<label><input type='checkbox' id='square' checked>Square</label>
-			<p>	<label><input type='checkbox' id='toroidal' checked>Toroidal map</label>
-			<p>	<button type="submit">Update</button> | <button type="reset">Reset</button>
-		</form>
+	<section id="sidebar">
+		<section>
+			<h2>Config</h2>
+			<form id='config'>
+				<p>	Mode: cells are born if they have exactly
+						<input type="number" id="born" value="3">
+					neighbours, and stay alive when having between
+						<input type="number" id="alive-min" value="2">
+					and
+						<input type="number" id="alive-max" value="3">
+					neighbours.
+				<p>
+					Board size: <input type="number" id="board-width" value="50">*<input type="number" id="board-height" value="50">
+					<label><input type='checkbox' id='square' checked>Square</label>
+				<p>	<label><input type='checkbox' id='toroidal' checked>Toroidal map</label>
+				<p>	<button type="submit">Update</button> | <button type="reset">Reset</button>
+			</form>
+		</section>
+		<section>
+			<h2>Maps</h2>
+			<p>	<select id="map"></select>
+				<button data-action="loadMap" class="control">Load</button>
+			<p>	<button data-action="exportMap" class="control">Export current map</button>
+		</section>
+		<section>
+			<h2>Output</h2>
+			<div id="output"></div>
+		</section>
 	</section>
 	<section id="board">
 		<h2>Board</h2>
-		<div id="controls">
-			<ul>
-				<li><button data-action="init">init</button></li>
-				<li><button data-action="step" disabled>step</button></li>
-				<li><button data-action="slower" disabled>slower</button></li>
-				<li><button data-action="play" disabled>play</button></li>
-				<li><button data-action="faster" disabled>faster</button></li>
-				<li><button data-action="stop" disabled>stop</button></li>
-			</ul>
-		</div>
+		<ul class="controls">
+			<li><button data-action="init">init</button></li>
+			<li><button data-action="step" disabled>step</button></li>
+			<li><button data-action="slower" disabled>slower</button></li>
+			<li><button data-action="play" disabled>play</button></li>
+			<li><button data-action="faster" disabled>faster</button></li>
+			<li><button data-action="stop" disabled>stop</button></li>
+		</ul>
 		<div id="info">
 			Generation: <label id="generation">?</label>
 			; speed: <label id="speed">?</label>
