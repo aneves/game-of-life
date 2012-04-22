@@ -19,16 +19,19 @@
 	<section id="config">
 		<h2>Config</h2>
 		<form>
-			<p>Mode: cells are born if they have exactly
+			<p>	Mode: cells are born if they have exactly
 					<input type="number" id="born" value="3">
 				neighbours, and stay alive when having between
 					<input type="number" id="alive-min" value="2">
 				and
 					<input type="number" id="alive-max" value="3">
 				neighbours.
-			<p>Map: <select id="map"></select>
-			<p>Board: <input type="number" id="board-width" value="50">*<input type="number" id="board-height" value="50">
-			<p><button type="submit">Update</button> | <button type="reset">Reset</button>
+			<p>	Map: <select id="map"></select>
+			<p>
+				Board size: <input type="number" id="board-width" value="50">*<input type="number" id="board-height" value="50">
+				<label><input type='checkbox' id='square' checked>Square</label>
+			<p>	<label><input type='checkbox' id='toroidal' checked>Toroidal map</label>
+			<p>	<button type="submit">Update</button> | <button type="reset">Reset</button>
 		</form>
 	</section>
 	<section id="board">

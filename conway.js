@@ -2,6 +2,9 @@
 (function ($) {
 	"use strict";
 	$(document).ready(function () {
+		var updateHeight = function() {
+				$('#board-height').val($(this).val());
+			};
 		$("#board canvas").conway();
 		$('#controls button').on({
 			click: function (e) {
@@ -21,24 +24,36 @@
 					'speed'		: parseInt	($('#speed').text()),
 					'map'		: JSON.parse($('#map').val()),
 					'width'		: parseInt($('#board-width').val()),
-					'height'	: parseInt($('#board-height').val())
+					'height'	: parseInt($('#board-height').val()),
+					'toroidal'	: $('#toroidal').is(':checked')
 				};
 				$("#board").conway('init', options);
 				e.preventDefault();
 			}
 		});
-		$('#board-height').attr('disabled', '');
-		$('#board-width').on({
-			'change': function() {
-				$('#board-height').val($(this).val());
+		$('#square').on({
+			'change':	function() {
+				var enable = $(this).is(':checked');
+				if(enable) {
+					$('#board-height').attr('disabled', '');
+					$('#board-width').on({
+						'change': updateHeight
+					});
+					$('#board-width').change();
+				} else {
+					$('#board-height').removeAttr('disabled');
+					$('#board-width').off({
+						'change': updateHeight
+					});
+				}
 			}
 		});
-		$('#board-width').change();
+		$('#square').change();
 	});
 
 	var maps = {
 		'T':	[[21, 21], [22, 21], [23, 21], [22, 22], [22, 23], [22, 24]],
-		'glider':		[[1, 3], [2, 3], [3, 3], [3, 2], [2, 1]],
+		'glider':		[[4, 3], [5, 3], [6, 3], [6, 2], [5, 1]],
 		'LWSS':			[[3, 4], [4, 3], [5, 3], [6, 3], [7, 3], [7, 4], [7, 5], [6, 6], [3, 6]],
 		'pulsar':		[[4, 2], [5, 2], [6, 2], [4, 7], [5, 7], [6, 7], [2, 4], [2, 5], [2, 6], [7, 4], [7, 5], [7, 6],
 						 [9, 4], [9, 5], [9, 6], [14, 4], [14, 5], [14, 6], [10, 2], [11, 2], [12, 2], [10, 7], [11, 7], [12, 7],
@@ -56,7 +71,8 @@
 			'height'	: 50,
 			'period'	: 1000,
 			'speed'		: 2,
-			'map'		: maps.pulsar
+			'map'		: maps.LWSS,
+			'toroidal'	: true
 		},
 		canvas,
 		ctx,
@@ -278,20 +294,28 @@
 			incrementNeighbours : function (world, x, y) {
 				if (x > 0) {
 					methods.incrementNeighboursY(world, x - 1, y);
+				} else if(settings.toroidal) {
+					methods.incrementNeighboursY(world, settings.width - 1, y);
 				}
 				methods.incrementNeighboursY(world, x, y);
 				world[y][x] -= 1;
 				if (x < settings.width - 1) {
 					methods.incrementNeighboursY(world, x + 1, y);
+				} else if(settings.toroidal) {
+					methods.incrementNeighboursY(world, 0, y);
 				}
 			},
 			incrementNeighboursY : function (world, x, y) {
 				if (y > 0) {
 					world[y - 1][x] += 1;
+				} else if(settings.toroidal) {
+					world[settings.height - 1][x] += 1;
 				}
 				world[y][x] += 1;
 				if (y < settings.height - 1) {
 					world[y + 1][x] += 1;
+				} else if(settings.toroidal) {
+					world[0][x] += 1;
 				}
 			}
 		};
