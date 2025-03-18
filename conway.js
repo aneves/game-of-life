@@ -1,4 +1,4 @@
-﻿
+
 (function ($) {
 	"use strict";
 	$(document).ready(function () {
@@ -10,7 +10,7 @@
 			click: function (e) {
 				e.preventDefault();
 				var action = $(this).data('action');
-				$("#board").conway(action);
+				$("#board canvas").conway(action);
 			}
 		});
 		$('form#config').on({

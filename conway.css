@@ -1,27 +1,35 @@
 ﻿
 body {
+	display: grid;
+	column-gap: 1em;
+	grid-template-columns: minmax(300px, 1fr) 300px;
+	grid-template-rows: auto;
+	padding-bottom: 15px;
 }
+body > * {
+	grid-column: 1;
+}
+body > #sidebar {
+	grid-column: 2;
+	/* Cannot use -1 when the rows are dynamic. */
+	grid-row-end: span 99;
+}
+
 
 * {
 	max-width: 100%;
 }
 
 #sidebar {
-	width: 300px;
-	float: right;
 	border-left: dashed 1px grey;
 	padding: 0 15px;
-	margin-left: 5px;
-	margin-bottom: 15px;
 	background: #f8f8f8;
 }
-#sidebar >*+* {
+#sidebar > *+* {
 	border-top: dashed 1px grey;
 }
 
-#board {
-	margin-right: 310px;
-}
+
 
 blockquote, #output {
 	border-left: dotted 1px black;
@@ -36,8 +44,24 @@ blockquote[cite]::after {
 	content: attr(cite);
 }
 
-canvas#board {
+#board {
 	border: dashed 1px grey;
+	/*
+	TODO:
+		Make the canvas draw pretty on different sizes.
+		Note that the grid draws ugly.
+		Maybe we can draw the canvas with width and height
+			equal to the board-size, or some multiple of that.
+
+	width: 100%;
+	aspect-ratio: 1 / 1;
+	*/
+	width: 300px;
+	height: 300px;
+}
+#board canvas {
+	width: 300px;
+	height: 300px;
 }
 
 input[type="number"] {
@@ -46,10 +70,10 @@ input[type="number"] {
 
 ul.controls {
 	padding: 0;
+	display: flex;
+	flex-wrap: wrap;
+	gap: .5em;
 }
 ul.controls li {
 	display: inline-block;
-}
-ul.controls li+li {
-	margin-left: 3px;
 }
