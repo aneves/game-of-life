@@ -31,10 +31,11 @@ body > #sidebar {
 
 
 
-blockquote, #output {
+blockquote,
+#output {
 	border-left: dotted 1px black;
 	padding-left: 5px;
-	white-space: pre-wrap;
+	white-space: wrap;
 }
 blockquote[cite]::after {
 	border-left: dotted 1px grey;
@@ -66,6 +67,10 @@ blockquote[cite]::after {
 
 input[type="number"] {
 	width: 3em;
+}
+
+h2.instructions {
+	display: none;
 }
 
 ul.controls {
